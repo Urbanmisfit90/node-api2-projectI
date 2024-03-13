@@ -116,6 +116,30 @@ router.put("/:id", (req, res) => {
     }
 });
 
-router.get("/:id/message", (req, res) => {});
+router.get("/:id/comments", async (req, res) => {
+    try {
+      // Find the post with the specified ID
+      const post = await Post.findById(req.params.id);
+  
+      // Handle case where the post doesn't exist
+      if (!post) {
+        return res.status(404).json({
+          message: "The post with the specified ID does not exist",
+        });
+      }
+  
+      // Efficiently retrieve comments associated with the post
+      const comments = await Post.findPostComments(post.id);  // Use post._id for reference
+  
+      // Respond with the retrieved comments
+      res.json(comments);
+    } catch (err) {
+      // Handle errors
+      res.status(500).json({
+        message: "Error retrieving comments",
+        error: err.message,
+      });
+    }
+  });
 
 module.exports = router;
